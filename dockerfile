@@ -8,8 +8,6 @@ EXPOSE $FASTAPI_LISTEN_PORT
 WORKDIR /
 ADD requirements.txt requirements.txt
 RUN pip install -r requirements.txt
-ADD bootstrap.sh bootstrap.sh
-RUN chmod 777 bootstrap.sh
 
 WORKDIR /apiserver
 ADD . .
