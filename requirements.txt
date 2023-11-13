@@ -1,0 +1,5 @@
+pymysql
+fastapi
+uvicorn[standard]
+sqlmodel
+PyYAML>=6.0
