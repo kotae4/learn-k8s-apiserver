@@ -5,7 +5,9 @@ from fastapi import Depends
 from . import config
 
 _engine = None
-def get_engine(settings: Annotated[config.Settings, Depends(config.get_settings)]) -> Engine:
+def get_engine() -> Engine:
+    global _engine
+    settings = config.get_settings()
     if _engine is None:
         db_url = URL.create(drivername=settings.db_driver,
                           username=settings.db_username,
