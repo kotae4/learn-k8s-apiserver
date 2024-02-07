@@ -16,7 +16,7 @@ The database is external (exists outside the cluster). This example will use a l
 
 `docker run --name apiserver -p 27036:27036 learn-k8s-apiserver`
 
-It expects a database (mariadb, but mysql is fine too) to be hosted @ `db.testing.private:3306` with username `root` and password `toor`. Configured in `database.py`.
+It expects a database (mariadb, but mysql is fine too) to be hosted @ `db.testing.private:3306` with username `root` and password `toor`. Configured in `config.py`, via .env file, or via environment variables.
 
 The [learn-k8s-webapp](https://github.com/kotae4/learn-k8s-webapp) microservice expects this API to be served at `http://api.testing.private:27036`.
 

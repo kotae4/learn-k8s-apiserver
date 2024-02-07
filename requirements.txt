@@ -3,3 +3,5 @@ fastapi
 uvicorn[standard]
 sqlmodel
 PyYAML>=6.0
+pydantic-settings
+python-dotenv
