@@ -4,9 +4,9 @@ metadata:
   name: apiserver-env
 data:
   DB_HOST: db.testing.private
-  DB_PORT: 3306
+  DB_PORT: "3306"
   DB_DRIVER: mysql+pymysql
   DB_USERNAME: root
   DB_PASSWORD: toor
   DB_DATABASE: appdb
-  DB_ECHO: true
+  DB_ECHO: "true"
