@@ -1,6 +1,10 @@
 from sqlmodel import Field, Relationship, SQLModel, func
 from typing import Optional, List
 import datetime
+from pydantic import BaseModel
+
+class HealthCheck(BaseModel):
+    message: str
 
 class Choice(SQLModel, table=True):
     choice_id: Optional[int] = Field(default=None, primary_key=True)

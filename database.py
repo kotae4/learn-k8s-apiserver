@@ -16,8 +16,8 @@ def get_engine() -> Engine:
                           port=settings.db_port,
                           database=settings.db_database,
                           query={"charset": "utf8mb4"})
-        connection_args = {}
-        _engine = create_engine(db_url, echo=settings.db_echo, connect_args=connection_args)
+        connection_args = {'connect_timeout': 10}
+        _engine = create_engine(db_url, pool_pre_ping=True, pool_timeout=30, echo_pool=True, echo=settings.db_echo, connect_args=connection_args)
     return _engine
 
 def create_db_and_tables():

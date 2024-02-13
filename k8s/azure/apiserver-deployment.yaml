@@ -20,5 +20,5 @@ spec:
         - name: learn-k8s-apiserver
           image: ghcr.io/kotae4/learn-k8s-apiserver:latest
           ports:
-            - containerPort: 27036
+            - containerPort: 27525
               name: apiport

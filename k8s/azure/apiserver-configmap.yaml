@@ -3,10 +3,10 @@ kind: ConfigMap
 metadata:
   name: apiserver-env
 data:
-  DB_HOST: db.testing.private
+  DB_HOST: db.local.testapp.private
   DB_PORT: "3306"
   DB_DRIVER: mysql+pymysql
-  DB_USERNAME: root
-  DB_PASSWORD: toor
+  DB_USERNAME: badmin
+  DB_PASSWORD: vagrant
   DB_DATABASE: appdb
   DB_ECHO: "true"

@@ -1,10 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlmodel import Session
+from fastapi import FastAPI, Depends, HTTPException, Response, status
+from sqlmodel import Session, select, text
 from . import models
 from . import database_interface
 from . import database
 import logging
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
+import os
+import signal
+import sys
 
 logger = logging.getLogger("apiserver")
 
@@ -12,18 +15,31 @@ app = FastAPI()
 
 @app.on_event('startup')
 def on_startup():
-    database.create_db_and_tables()
-    logger.info("Finished starting up!")
+    try:
+        database.create_db_and_tables()
+        logger.info("Finished starting up!")
+    except OperationalError as oe:
+        logger.error(oe)
+        logger.error("Attempting to exit by sending SIGTERM to pid {}".format(os.getpid()))
+        os.kill(os.getpid(), signal.SIGTERM)
+        sys.exit(4)
+        return
+
+@app.get('/healthcheck')
+def getHealthCheck(response: Response) -> models.HealthCheck:
+    try:
+        with Session(database.get_engine()) as db:
+            db.exec(text('SELECT 1;'))
+            db.commit()
+            return models.HealthCheck(message="healthy")
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        errorMsg = str(e)
+        return models.HealthCheck(message=errorMsg)
 
 @app.get('/polls')
 def getPolls(offset: int = 0, limit: int = 10, db: Session = Depends(database.get_db)) -> list[models.PollRead]:
     polls = database_interface.read_polls(db, limit, offset)
-    logger.info("Returning this value from GET polls:")
-    logger.info(polls)
-    logger.info("Choices:")
-    if len(polls) > 0:
-        logger.info(polls[0].choices)
-    logger.info("Returning now.")
     return polls
 
 @app.get('/polls/{pollId}')
@@ -34,25 +50,16 @@ def getPoll(pollId: int, db: Session = Depends(database.get_db)) -> models.PollR
 def getVotes(pollId: int, db: Session = Depends(database.get_db)) -> models.VoteSummary:
     votes = database_interface.read_votes(db, pollId)
     choiceSummaries = database_interface.read_vote_summary_choices(db, pollId)
-    logger.info("Got votes:")
-    logger.info(votes)
-    logger.info("Got choice summaries:")
-    logger.info(choiceSummaries)
     if len(choiceSummaries) == 0:
         poll = database_interface.read_poll(db, pollId)
         for choice in poll.choices:
             choiceSummaries.append(models.VoteSummaryChoices(choice=choice, total_votes=0))
     voteSummary = models.VoteSummary(choices=choiceSummaries, votes=votes)
-    logger.info("Returning with this voteSummary:")
-    logger.info(voteSummary)
     return voteSummary
 
 @app.post('/polls')
 def createPoll(poll: models.PollCreate, db: Session = Depends(database.get_db)) -> models.PollRead:
     poll = database_interface.create_poll(db, poll)
-    logger.info("Returning this value from POST polls:")
-    logger.info(poll)
-    logger.info("Returning now.")
     return poll
 
 @app.post('/votes/{pollId}')

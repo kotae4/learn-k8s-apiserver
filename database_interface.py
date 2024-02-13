@@ -2,9 +2,16 @@ from . import models
 from sqlmodel import Session, select, func
 from sqlalchemy import and_
 
+import logging
+logger = logging.getLogger("apiserver")
 def create_poll(db: Session, pollData: models.PollCreate) -> models.Poll:
-    poll : models.Poll = models.Poll.from_orm(pollData)
-    for choice in pollData.choices:
+    # no idea why but the relationship of Poll.choices errors out on model_validate
+    # so remove choices from the initial data
+    # then add it back once the Poll is instantiated...
+    derp = pollData.choices.copy()
+    pollData.choices.clear()
+    poll : models.Poll = models.Poll.model_validate(pollData)
+    for choice in derp:
         poll.choices.append(models.Choice(text=choice))
     db.add(poll)
     db.commit()
@@ -12,7 +19,7 @@ def create_poll(db: Session, pollData: models.PollCreate) -> models.Poll:
     return poll
 
 def create_vote(db: Session, voteData: models.VoteBase) -> models.Vote:
-    vote: models.Vote = models.Vote.from_orm(voteData)
+    vote: models.Vote = models.Vote.model_validate(voteData)
     db.add(vote)
     db.commit()
     db.refresh(vote)

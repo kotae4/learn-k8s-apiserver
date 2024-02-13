@@ -8,5 +8,5 @@ spec:
     app: learn-k8s-apiserver
   ports:
     - name: http
-      port: 27036
+      port: 27525
       targetPort: apiport
