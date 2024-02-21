@@ -19,6 +19,9 @@ spec:
       containers:
         - name: learn-k8s-apiserver
           image: ghcr.io/kotae4/learn-k8s-apiserver:latest
+          envFrom:
+          - configMapRef:
+              name: apiserver-env
           ports:
             - containerPort: 27525
               name: apiport
