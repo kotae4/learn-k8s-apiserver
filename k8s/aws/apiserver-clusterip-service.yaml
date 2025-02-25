@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn-k8s-apiserver-clusterip
+  namespace: learn-k8s-apiserver
+  labels:
+    app: learn-k8s-apiserver
+spec:
+  type: ClusterIP
+  selector:
+    app: learn-k8s-apiserver
+  ports:
+    - name: http
+      port: 27525
+      targetPort: apiport

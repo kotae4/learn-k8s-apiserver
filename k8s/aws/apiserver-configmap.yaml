@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apiserver-env
+  namespace: learn-k8s-apiserver
+data:
+  DB_HOST: externaldb
+  DB_PORT: "3306"
+  DB_DRIVER: mysql+pymysql
+  DB_USERNAME: badmin
+  DB_PASSWORD: vagrant
+  DB_DATABASE: appdb
+  DB_ECHO: "true"

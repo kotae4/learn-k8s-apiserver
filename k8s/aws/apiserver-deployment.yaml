@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn-k8s-apiserver
+  namespace: learn-k8s-apiserver
+  labels:
+    app: learn-k8s-apiserver
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: learn-k8s-apiserver
+  template:
+    metadata:
+      labels:
+        app: learn-k8s-apiserver
+        tier: backend
+    spec:
+      containers:
+        - name: learn-k8s-apiserver
+          image: ghcr.io/kotae4/learn-k8s-apiserver:latest
+          envFrom:
+          - configMapRef:
+              name: apiserver-env
+          ports:
+            - containerPort: 27525
+              name: apiport
