@@ -14,10 +14,11 @@ def get_engine() -> Engine:
                           password=settings.db_password,
                           host=settings.db_host,
                           port=settings.db_port,
-                          database=settings.db_database,
                           query={"charset": "utf8mb4"})
         connection_args = {'connect_timeout': 10}
         _engine = create_engine(db_url, pool_pre_ping=True, pool_timeout=30, echo_pool=True, echo=settings.db_echo, connect_args=connection_args)
+        _engine.execute("CREATE DATABASE IF NOT EXISTS {0}".format(settings.db_database))
+        _engine.execute("USE {0}".format(settings.db_database))
     return _engine
 
 def create_db_and_tables():
