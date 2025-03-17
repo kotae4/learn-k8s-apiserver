@@ -26,7 +26,7 @@ def on_startup():
         return
 
 @app.get('/healthcheck')
-def getHealthCheck(response: Response) -> models.HealthCheck:
+async def getHealthCheck(response: Response) -> models.HealthCheck:
     try:
         with Session(database.get_engine()) as db:
             db.exec(text('SELECT 1;'))
@@ -38,16 +38,16 @@ def getHealthCheck(response: Response) -> models.HealthCheck:
         return models.HealthCheck(message=errorMsg)
 
 @app.get('/polls')
-def getPolls(offset: int = 0, limit: int = 10, db: Session = Depends(database.get_db)) -> list[models.PollRead]:
+async def getPolls(offset: int = 0, limit: int = 10, db: Session = Depends(database.get_db)) -> list[models.PollRead]:
     polls = database_interface.read_polls(db, limit, offset)
     return polls
 
 @app.get('/polls/{pollId}')
-def getPoll(pollId: int, db: Session = Depends(database.get_db)) -> models.PollRead:
+async def getPoll(pollId: int, db: Session = Depends(database.get_db)) -> models.PollRead:
     return database_interface.read_poll(db, pollId)
 
 @app.get('/votes/{pollId}')
-def getVotes(pollId: int, db: Session = Depends(database.get_db)) -> models.VoteSummary:
+async def getVotes(pollId: int, db: Session = Depends(database.get_db)) -> models.VoteSummary:
     votes = database_interface.read_votes(db, pollId)
     choiceSummaries = database_interface.read_vote_summary_choices(db, pollId)
     if len(choiceSummaries) == 0:
@@ -58,12 +58,12 @@ def getVotes(pollId: int, db: Session = Depends(database.get_db)) -> models.Vote
     return voteSummary
 
 @app.post('/polls')
-def createPoll(poll: models.PollCreate, db: Session = Depends(database.get_db)) -> models.PollRead:
+async def createPoll(poll: models.PollCreate, db: Session = Depends(database.get_db)) -> models.PollRead:
     poll = database_interface.create_poll(db, poll)
     return poll
 
 @app.post('/votes/{pollId}')
-def createVote(pollId: int, choice: models.VoteBase, db: Session = Depends(database.get_db)) -> models.VoteSummary:
+async def createVote(pollId: int, choice: models.VoteBase, db: Session = Depends(database.get_db)) -> models.VoteSummary:
     try:
         vote = database_interface.create_vote(db, choice)
     except IntegrityError as e:
